@@ -52,7 +52,7 @@ function Game() {
     const newColor = generateColor(); // gera cor aleatória
     setCurrentColor(newColor); // adiciona na cor que deve ser acertada
     const newOptions = [newColor]; // adiciona no array
-    while (newOptions.length < difficulty) {  // enquanto as opções forem menor que 3 adiciona mais opções aleatórias no array, se a opção por coincidência ja existir não adiciona.
+    while (newOptions.length < difficulty) {  // enquanto as opções forem menor que o numero de opções referente ao nivel de dificuldade adiciona mais opções aleatórias no array, se a opção por coincidência ja existir não adiciona.
       const option = generateColor();
       if (!newOptions.includes(option)) {
         newOptions.push(option);
