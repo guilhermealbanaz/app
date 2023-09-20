@@ -6,13 +6,13 @@ export const GameProvider = ({ children }) => {
     const [currentColor, setCurrentColor] = useState(null);
     const [options, setOptions] = useState([]);
     const [score, setScore] = useState(0);
-    const [highScore, setHighScore] = useState(() => Number(localStorage.getItem('high')) || 0);
+    const [highScore, setHighScore] = useState(() => Number(localStorage.getItem('highScore')) || 0);
     const [gameStatus, setGameStatus] = useState("notStarted");
     const [timeLeft, setTimeLeft] = useState(10);
     const [history, setHistory] = useState([]);
     const [difficulty, setDifficulty] = useState(3);
     const scoreRef = useRef(score);
-  
+
     const resetData = () => {
         localStorage.clear();
         setHighScore(0);
@@ -21,15 +21,15 @@ export const GameProvider = ({ children }) => {
         setHistory([]);
         setDifficulty(3);
       }
-    
-      const handleDifficultyChange = useCallback((newDifficulty) => {
+
+      const handleDifficultyChange = useCallback(newDifficulty => {
         setDifficulty(newDifficulty);
       }, []);
-    
+
       const generateColor = () => {
         return "#" + Math.floor(Math.random() * 16777215).toString(16);
       };
-    
+
       const nextRound = useCallback(() => {
         const newColor = generateColor(); // gera cor aleatória
         setCurrentColor(newColor); // adiciona na cor que deve ser acertada
@@ -43,14 +43,14 @@ export const GameProvider = ({ children }) => {
         // embaralha as opções
         setOptions(newOptions.sort(() => Math.random() - 0.5));
       }, [difficulty]);
-    
+
       const startGame = useCallback(() => {
         setHistory([]);
         setScore(0); // restarta o score
         setGameStatus('inProgress'); // muda status ao começar
         setTimeLeft(10); // restarta o tempo quando inicia o jogo
         nextRound(); // inicia uma rodada gerando uma cor, adicionando opções e embaralhando-as
-    
+
         // depois de 30s muda o status do game para terminado
         setTimeout(() => {
             setHighScore((currentHighScore) => {
@@ -61,7 +61,7 @@ export const GameProvider = ({ children }) => {
               setGameStatus('ended');
         }, 30000);
         }, [nextRound]);
-    
+
       const handleAnswer = useCallback((answer) => {
         const isCurrentColor = answer === currentColor;
         if (gameStatus !== 'inProgress') return;
@@ -72,10 +72,10 @@ export const GameProvider = ({ children }) => {
         }
         setTimeLeft(10);
         nextRound();
-    
+
         setHistory(prevHistory => [...prevHistory, { answer, isCurrentColor: isCurrentColor }])
       }, [currentColor, gameStatus, nextRound]);
-    
+
       useEffect(() => {
         let timerId;
         if (timeLeft > 0) {
@@ -87,17 +87,32 @@ export const GameProvider = ({ children }) => {
         }
           return () => clearTimeout(timerId);
       }, [timeLeft, gameStatus, handleAnswer, nextRound]);
-    
+
+	  const props = {
+		currentColor,
+		options,
+		score,
+		highScore,
+		gameStatus,
+		timeLeft,
+		history,
+		difficulty,
+		resetData,
+		handleDifficultyChange,
+		startGame,
+		handleAnswer
+	  }
+
       useEffect(() => {
         scoreRef.current = score;
       }, [score]);
-    
-  
+
+
     return (
-      <GameContext.Provider value={{ currentColor, options, score, highScore, gameStatus, timeLeft, history, difficulty, resetData, handleDifficultyChange, startGame, handleAnswer }}>
+      <GameContext.Provider value={props}>
         {children}
       </GameContext.Provider>
     );
   };
-  
+
   export const useGame = () => useContext(GameContext);

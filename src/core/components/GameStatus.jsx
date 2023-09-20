@@ -1,8 +1,8 @@
 import { useGame } from '../context/GameContext';
-import './Global.css';
+import { ProgressBar } from './ProgressBar';
 
 export const GameStatus = () => {
-  const { gameStatus, timeLeft } = useGame();
+  const { gameStatus } = useGame();
 
-  return gameStatus === "inProgress" && <p>Time left: {timeLeft} seconds</p>;
+  return gameStatus === "inProgress" && <ProgressBar />;
 }
